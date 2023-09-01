@@ -4,6 +4,8 @@ document.addEventListener('DOMContentLoaded', init);
 function init() {
     const gameBoard = document.querySelector('#gameboard');
     createBoard(gameBoard);
+    const allSquares = document.querySelectorAll('#gameboard .square');
+    allSquaresAddEvent(allSquares);
 }
 
 const width = 8;
@@ -25,6 +27,7 @@ function createBoard(gameBoard) {
         const square = document.createElement('div');
         square.classList.add('square');
         square.innerHTML = piece;
+        square.firstChild?.setAttribute('draggable', true);
         square.setAttribute('square-id', i);
         const row = Math.floor((63 - i) / 8) + 1
         if (row % 2 === 0) {
@@ -43,4 +46,31 @@ function createBoard(gameBoard) {
 
         gameBoard.append(square);
     })
+}
+
+function allSquaresAddEvent(squares) {
+    squares.forEach(square => {
+        square.addEventListener('dragstart', dragStart);
+        square.addEventListener('dragover', dragOver);
+        square.addEventListener('drop', dragDrop);
+    })
+}
+let startPositionId;
+let draggedElement;
+
+function dragStart(e) {
+    console.log(e.target)
+    startPositionId = e.target.parentNode.getAttribute('square-id');
+    draggedElement = e.target;
+}
+
+function dragOver(e) {
+    e.preventDefault();
+
+}  
+
+function dragDrop(e) {
+    e.stopPropagation();
+    const taken = e.target.classList.contains('piece');
+    e.target.append(draggedElement);
 }
