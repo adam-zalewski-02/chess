@@ -24,3 +24,13 @@
 .brown {
     background-color: brown;
 }
+
+.black {
+    fill: black;
+}
+
+.white {
+    fill: white;
+    stroke: black;
+    stroke-width: 10px;
+}
