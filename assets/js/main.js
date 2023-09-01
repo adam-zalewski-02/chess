@@ -26,7 +26,13 @@ function createBoard(gameBoard) {
         square.classList.add('square');
         square.innerHTML = piece;
         square.setAttribute('square-id', i);
-        square.classList.add('white');
+        const row = Math.floor((63 - i) / 8) + 1
+        if (row % 2 === 0) {
+            square.classList.add(i % 2 === 0 ? "beige" : "brown")
+        } else {
+            square.classList.add(i % 2 === 0 ? "brown" : "beige")
+        }
+
         gameBoard.append(square);
     })
 }
