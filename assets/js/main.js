@@ -2,10 +2,10 @@
 document.addEventListener('DOMContentLoaded', init);
 
 function init() {
-    createBoard();
+    const gameBoard = document.querySelector('#gameboard');
+    createBoard(gameBoard);
 }
 
-const gameBoard = document.querySelector('#gameboard')
 const width = 8;
 
 const startPieces = [
@@ -20,9 +20,13 @@ const startPieces = [
 ]
 
 
-function createBoard() {
-    startPieces.forEach(piece => {
+function createBoard(gameBoard) {
+    startPieces.forEach((piece, i) => {
         const square = document.createElement('div');
         square.classList.add('square');
+        square.innerHTML = piece;
+        square.setAttribute('square-id', i);
+        square.classList.add('white');
+        gameBoard.append(square);
     })
 }
