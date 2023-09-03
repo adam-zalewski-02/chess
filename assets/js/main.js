@@ -98,30 +98,79 @@ function dragDrop(e) {
             case 'pawn':
                 handlePawnMove(startRow, startCol, destRow, destCol, destinationSquare);
                 break;
+            case 'rook':
+                handleRookMove(startRow, startCol, destRow, destCol, destinationSquare);
+                break;
             default:
                 //other pieces
                 break;
         }
     }
+    console.log(currentPlayer);
 
 }
 
 function handlePawnMove(startRow, startCol, destRow, destCol, destinationSquare) {
     if (
+        (currentPlayer === 'white' && destRow < startRow && destCol === startCol) ||
+        (currentPlayer === 'black' && destRow > startRow && destCol === startCol) ||
         (currentPlayer === 'white' && destRow === startRow - 1 && destCol === startCol) ||
         (currentPlayer === 'black' && destRow === startRow + 1 && destCol === startCol) ||
         (currentPlayer === 'white' && startRow === 6 && destRow === 4 && destCol === startCol) ||
         (currentPlayer === 'black' && startRow === 1 && destRow === 3 && destCol === startCol)
     ) {
-        console.log("destrow: " + destRow + " startRow: " + startRow);
+        console.log("startrow: " + startRow + " startCol: " + startCol);
+        console.log("destrow: " + destRow + " destCol: " + destCol);
         destinationSquare.appendChild(draggedElement);
         refreshDraggedElement();
         changePlayer();
     } else {
-        const startSquare = document.querySelector(`[square-id="${startPositionId}"]`);
-        startSquare.appendChild(draggedElement);
-        refreshDraggedElement();
+        invalidMove();
     }
+}
+
+
+function handleRookMove(startRow, startCol, destRow, destCol, destinationSquare) {
+    if (
+        (currentPlayer === 'white' && startRow === destRow || startCol === destCol) ||
+        (currentPlayer === 'black' && startRow === destRow || startCol === destCol)
+        ) {
+        if (isPathClear(startRow, startCol, destRow, destCol)) {
+            destinationSquare.appendChild(draggedElement);
+            refreshDraggedElement();
+            changePlayer();
+        } else {
+            invalidMove();
+        }
+    } else {
+        invalidMove();
+    }
+}
+
+function isPathClear(startRow, startCol, destRow, destCol) {
+    if (startRow === destRow) {
+        const minCol = Math.min(startCol, destCol);
+        const maxCol = Math.max(startCol, destCol);
+
+        for (let col = minCol + 1; col < maxCol; col++) {
+            const square = document.querySelector(`[square-id="${startRow * width + col}"]`);
+            if (square.firstChild) {
+                return false;
+            }
+        }
+    } else {
+        const minRow = Math.min(startRow, destRow);
+        const maxRow = Math.max(startRow, destRow);
+
+        for (let row = minRow + 1; row < maxRow; row++) {
+            const square = document.querySelector(`[square-id="${row * width + startCol}"]`);
+            if (square.firstChild) {
+                return false;
+            }
+        }
+    }
+
+    return true;
 }
 
 function refreshDraggedElement() {
@@ -134,4 +183,10 @@ function changePlayer() {
     } else {
         currentPlayer = "white";
     }
+}
+
+function invalidMove() {
+    const startSquare = document.querySelector(`[square-id="${startPositionId}"]`);
+    startSquare.appendChild(draggedElement);
+    refreshDraggedElement();
 }
