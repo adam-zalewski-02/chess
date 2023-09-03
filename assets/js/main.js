@@ -4,8 +4,12 @@ document.addEventListener('DOMContentLoaded', init);
 function init() {
     const gameBoard = document.querySelector('#gameboard');
     createBoard(gameBoard);
-    const allSquares = document.querySelectorAll('#gameboard .square');
-    allSquaresAddEvent(allSquares);
+
+    const allSquare = document.querySelectorAll('.square');
+    allSquareAddEvent(allSquare);
+
+    const allPieces = document.querySelectorAll('.piece');
+    allPieceAddEvent(allPieces);
 }
 
 const width = 8;
@@ -29,6 +33,7 @@ function createBoard(gameBoard) {
         square.innerHTML = piece;
         square.firstChild?.setAttribute('draggable', true);
         square.setAttribute('square-id', i);
+
         const row = Math.floor((63 - i) / 8) + 1
         if (row % 2 === 0) {
             square.classList.add(i % 2 === 0 ? "beige" : "brown")
@@ -48,29 +53,78 @@ function createBoard(gameBoard) {
     })
 }
 
-function allSquaresAddEvent(squares) {
+
+
+
+
+function allSquareAddEvent(squares) {
     squares.forEach(square => {
-        square.addEventListener('dragstart', dragStart);
         square.addEventListener('dragover', dragOver);
-        square.addEventListener('drop', dragDrop);
+        square.addEventListener('drop',dragDrop);
     })
 }
+
+function allPieceAddEvent(pieces) {
+    pieces.forEach(piece => {
+        piece.addEventListener('dragstart', dragStart);
+    })
+}
+
 let startPositionId;
 let draggedElement;
+let currentPlayer = 'white';
 
 function dragStart(e) {
-    console.log(e.target)
-    startPositionId = e.target.parentNode.getAttribute('square-id');
-    draggedElement = e.target;
+    console.log("moved");
+    startPositionId = e.currentTarget.parentNode.getAttribute('square-id');
+    draggedElement = e.currentTarget;
 }
 
 function dragOver(e) {
     e.preventDefault();
-
 }  
 
 function dragDrop(e) {
     e.stopPropagation();
-    const taken = e.target.classList.contains('piece');
-    e.target.append(draggedElement);
+    console.log(e.target);
+    const destinationSquare = e.currentTarget;
+    if (!destinationSquare.firstChild) {
+        destinationSquare.appendChild(draggedElement);
+        draggedElement = null;
+        return;
+    }
+
+    const draggedPieceColor = draggedElement.firstChild.classList.contains('black') ? 'black' : 'white';
+    const destinationPieceColor = destinationSquare.firstChild.classList.contains('black') ? 'black' : 'white';
+
+    if (draggedPieceColor === destinationPieceColor) {
+        const startSquare = document.querySelector(`[square-id="${startPositionId}"]`);
+        startSquare.appendChild(draggedElement);
+    }
+
+    //changePlayer();
+}
+
+function changePlayer() {
+    if (currentPlayer === "white") {
+        reverseId();
+        currentPlayer = "black";
+    } else {
+        revertId();
+        currentPlayer = "white";
+    }
+}
+
+function reverseId() {
+    const allSquares = document.querySelectorAll('.square');
+    allSquares.forEach((square, i) => {
+        square.setAttribute('square-id', (width * width - 1) - i);
+    })
+}
+
+function revertId() {
+    const allSquares = document.querySelectorAll('.square');
+    allSquares.forEach((square, i) => {
+        square.setAttribute('square-id', i);
+    })
 }
