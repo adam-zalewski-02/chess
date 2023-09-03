@@ -86,45 +86,52 @@ function dragOver(e) {
 
 function dragDrop(e) {
     e.stopPropagation();
-    console.log(e.target);
     const destinationSquare = e.currentTarget;
+
     if (!destinationSquare.firstChild) {
-        destinationSquare.appendChild(draggedElement);
-        draggedElement = null;
-        return;
+        const startRow = Math.floor(startPositionId / width);
+        const startCol = startPositionId % width;
+        const destRow = Math.floor(destinationSquare.getAttribute('square-id') / width);
+        const destCol = destinationSquare.getAttribute('square-id') % width;
+
+        switch (draggedElement.id) {
+            case 'pawn':
+                handlePawnMove(startRow, startCol, destRow, destCol, destinationSquare);
+                break;
+            default:
+                //other pieces
+                break;
+        }
     }
 
-    const draggedPieceColor = draggedElement.firstChild.classList.contains('black') ? 'black' : 'white';
-    const destinationPieceColor = destinationSquare.firstChild.classList.contains('black') ? 'black' : 'white';
+}
 
-    if (draggedPieceColor === destinationPieceColor) {
+function handlePawnMove(startRow, startCol, destRow, destCol, destinationSquare) {
+    if (
+        (currentPlayer === 'white' && destRow === startRow - 1 && destCol === startCol) ||
+        (currentPlayer === 'black' && destRow === startRow + 1 && destCol === startCol) ||
+        (currentPlayer === 'white' && startRow === 6 && destRow === 4 && destCol === startCol) ||
+        (currentPlayer === 'black' && startRow === 1 && destRow === 3 && destCol === startCol)
+    ) {
+        console.log("destrow: " + destRow + " startRow: " + startRow);
+        destinationSquare.appendChild(draggedElement);
+        refreshDraggedElement();
+        changePlayer();
+    } else {
         const startSquare = document.querySelector(`[square-id="${startPositionId}"]`);
         startSquare.appendChild(draggedElement);
+        refreshDraggedElement();
     }
+}
 
-    //changePlayer();
+function refreshDraggedElement() {
+    draggedElement = null;
 }
 
 function changePlayer() {
     if (currentPlayer === "white") {
-        reverseId();
         currentPlayer = "black";
     } else {
-        revertId();
         currentPlayer = "white";
     }
-}
-
-function reverseId() {
-    const allSquares = document.querySelectorAll('.square');
-    allSquares.forEach((square, i) => {
-        square.setAttribute('square-id', (width * width - 1) - i);
-    })
-}
-
-function revertId() {
-    const allSquares = document.querySelectorAll('.square');
-    allSquares.forEach((square, i) => {
-        square.setAttribute('square-id', i);
-    })
 }
