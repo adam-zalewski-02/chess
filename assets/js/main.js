@@ -75,9 +75,10 @@ let draggedElement;
 let currentPlayer = 'white';
 
 function dragStart(e) {
-    console.log("moved");
-    startPositionId = e.currentTarget.parentNode.getAttribute('square-id');
-    draggedElement = e.currentTarget;
+    if (e.currentTarget.getAttribute('draggable') === "true") {
+        startPositionId = e.currentTarget.parentNode.getAttribute('square-id');
+        draggedElement = e.currentTarget;
+    }
 }
 
 function dragOver(e) {
@@ -125,7 +126,7 @@ function handlePawnMove(startRow, startCol, destRow, destCol, destinationSquare)
         refreshDraggedElement();
         changePlayer();
     } else {
-        invalidMove();
+       invalidMove();
     }
 }
 
@@ -179,9 +180,14 @@ function refreshDraggedElement() {
 
 function changePlayer() {
     if (currentPlayer === "white") {
+        removeEventFromPlayer();
         currentPlayer = "black";
+        addDragEventToPlayer();
+
     } else {
+        removeEventFromPlayer();
         currentPlayer = "white";
+        addDragEventToPlayer();
     }
 }
 
@@ -189,4 +195,30 @@ function invalidMove() {
     const startSquare = document.querySelector(`[square-id="${startPositionId}"]`);
     startSquare.appendChild(draggedElement);
     refreshDraggedElement();
+}
+
+function removeEventFromPlayer() {
+    const allPieces = document.querySelectorAll('.piece');
+    const currentPlayerPieces = [];
+
+    allPieces.forEach(piece => {
+        piece.firstChild.classList.contains(currentPlayer)?currentPlayerPieces.push(piece) : null;
+    })
+    
+    currentPlayerPieces.forEach(piece => {
+        piece.removeEventListener('dragstart', dragStart);
+    })
+}
+
+function addDragEventToPlayer() {
+    const allPieces = document.querySelectorAll('.piece');
+    const currentPlayerPieces = [];
+
+    allPieces.forEach(piece => {
+        piece.firstChild.classList.contains(currentPlayer)?currentPlayerPieces.push(piece) : null;
+    })
+    
+    currentPlayerPieces.forEach(piece => {
+        piece.addEventListener('dragstart', dragStart);
+    })
 }
